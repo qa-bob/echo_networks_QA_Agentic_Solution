@@ -1,3 +1,8 @@
+---
+description: Parse test results and display a structured summary with per-suite pass rates
+invocation: user
+---
+
 # /generate-report
 
 Open the Playwright HTML report and display a structured summary of test results.

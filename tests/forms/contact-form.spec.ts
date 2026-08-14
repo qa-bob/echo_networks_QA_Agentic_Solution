@@ -19,57 +19,32 @@ test.describe('Contact Form @forms', () => {
 
   // ── Form presence ───────────────────────────────────────────────────────────
 
-  test('contact form is present on site @forms', async ({ contactPage, siteConfig, page }) => {
+  test('contact form is present on site @forms', async ({ contactPage, siteConfig }) => {
     // Check homepage first
     await contactPage.navigate();
     let form = await contactPage.findContactForm();
 
+    // If not on homepage, walk common contact page paths (including site-specific slugs)
     if (!form) {
-      // Try /contact, /contact-us, /get-in-touch
-      const contactPaths = ['/contact', '/contact-us', '/get-in-touch', '/reach-out'];
-      for (const contactPath of contactPaths) {
-        try {
-          await page.goto(siteConfig.url.replace(/\/$/, '') + contactPath, {
-            waitUntil: 'domcontentloaded',
-            timeout: 10_000,
-          });
-          form = await contactPage.findContactForm();
-          if (form) break;
-        } catch {
-          // Path doesn't exist — try next
-        }
-      }
-    }
-
-    if (!form) {
-      // Also check if there's a "Contact" link in nav to follow
-      const contactLink = page.locator('a').filter({ hasText: /contact/i }).first();
-      if (await contactLink.count() > 0) {
-        await contactLink.click();
-        await page.waitForLoadState('domcontentloaded');
-        form = await contactPage.findContactForm();
-      }
+      await contactPage.navigateToContactPage();
+      form = await contactPage.findContactForm();
     }
 
     expect(
       form,
       `No contact form found on "${siteConfig.name}". ` +
-        'Checked homepage, /contact, /contact-us, /get-in-touch, and nav Contact link.'
+        'Checked homepage and common contact page paths (/contact, /reach-out-to-us-2, etc.).'
     ).not.toBeNull();
   });
 
   // ── Required fields ─────────────────────────────────────────────────────────
 
-  test('contact form has required fields (name, email) @forms', async ({ contactPage, siteConfig, page }) => {
-    // Navigate to find the form
+  test('contact form has required fields (name, email) @forms', async ({ contactPage, siteConfig }) => {
     await contactPage.navigate();
     let form = await contactPage.findContactForm();
 
     if (!form) {
-      await page.goto(siteConfig.url.replace(/\/$/, '') + '/contact', {
-        waitUntil: 'domcontentloaded',
-        timeout: 10_000,
-      }).catch(() => null);
+      await contactPage.navigateToContactPage();
       form = await contactPage.findContactForm();
     }
 
@@ -93,15 +68,12 @@ test.describe('Contact Form @forms', () => {
 
   // ── Submit button ───────────────────────────────────────────────────────────
 
-  test('contact form has a submit button @forms', async ({ contactPage, siteConfig, page }) => {
+  test('contact form has a submit button @forms', async ({ contactPage, siteConfig }) => {
     await contactPage.navigate();
     let form = await contactPage.findContactForm();
 
     if (!form) {
-      await page.goto(siteConfig.url.replace(/\/$/, '') + '/contact', {
-        waitUntil: 'domcontentloaded',
-        timeout: 10_000,
-      }).catch(() => null);
+      await contactPage.navigateToContactPage();
       form = await contactPage.findContactForm();
     }
 
@@ -121,10 +93,7 @@ test.describe('Contact Form @forms', () => {
     let form = await contactPage.findContactForm();
 
     if (!form) {
-      await page.goto(siteConfig.url.replace(/\/$/, '') + '/contact', {
-        waitUntil: 'domcontentloaded',
-        timeout: 10_000,
-      }).catch(() => null);
+      await contactPage.navigateToContactPage();
       form = await contactPage.findContactForm();
     }
 
@@ -139,7 +108,6 @@ test.describe('Contact Form @forms', () => {
     for (const field of fields) {
       if (field.type === 'hidden' || field.type === 'submit') continue;
 
-      // Check for associated <label>, aria-label, or placeholder
       const fieldLocator = form.locator(
         `input[name="${field.name}"], textarea[name="${field.name}"]`
       ).first();
@@ -183,10 +151,7 @@ test.describe('Contact Form @forms', () => {
     let form = await contactPage.findContactForm();
 
     if (!form) {
-      await page.goto(siteConfig.url.replace(/\/$/, '') + '/contact', {
-        waitUntil: 'domcontentloaded',
-        timeout: 10_000,
-      }).catch(() => null);
+      await contactPage.navigateToContactPage();
       form = await contactPage.findContactForm();
     }
 
@@ -201,7 +166,6 @@ test.describe('Contact Form @forms', () => {
       return;
     }
 
-    // Click submit without filling any fields
     const submitBtn = form
       .locator('button[type="submit"], input[type="submit"], button:not([type="button"]):not([type="reset"])')
       .first();
@@ -219,13 +183,12 @@ test.describe('Contact Form @forms', () => {
     // Wait briefly to allow validation messages to appear
     await page.waitForTimeout(500);
 
-    // Check that we're still on the same page (form was NOT submitted)
     expect(
       navigationTriggered,
       'Clicking submit on an empty form should NOT navigate away (validation should prevent submission)'
     ).toBeFalsy();
 
-    // Check for HTML5 validation API on required fields
+    // Check HTML5 validation API on required fields
     const firstRequired = form.locator('[required]').first();
     if (await firstRequired.count() > 0) {
       const isValid = await firstRequired.evaluate<boolean>((el) => {

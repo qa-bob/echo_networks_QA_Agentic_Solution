@@ -85,9 +85,16 @@ export class NavigationPage extends BasePage {
    */
   async getMobileMenuToggle(): Promise<Locator | null> {
     const candidates = [
+      // Explicit button role with toggle-related label
       this.page.getByRole('button', { name: /menu|navigation|toggle|hamburger/i }),
-      this.page.locator('[class*="hamburger"], [class*="menu-toggle"], [class*="nav-toggle"]'),
-      this.page.locator('[aria-label*="menu" i], [aria-label*="navigation" i]').filter({ hasNotText: /^\s*$/ }),
+      // Class-based hamburger patterns
+      this.page.locator('[class*="hamburger"], [class*="menu-toggle"], [class*="nav-toggle"], [class*="dd-toggle"]'),
+      // aria-label match — exclude <nav> and role="menu"/"navigation" so we don't match the nav element itself
+      this.page.locator(
+        '[aria-label*="menu" i]:not(nav):not([role="navigation"]):not([role="menu"]),' +
+        '[aria-label*="navigation" i]:not(nav):not([role="navigation"]):not([role="menu"])'
+      ).filter({ hasNotText: /^\s*$/ }),
+      // Any button with aria-expanded (common toggle pattern)
       this.page.locator('button[aria-expanded]').first(),
     ];
 

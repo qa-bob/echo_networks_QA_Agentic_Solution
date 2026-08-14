@@ -16,6 +16,58 @@ export interface FormFieldInfo {
 }
 
 export class ContactFormPage extends BasePage {
+  // ── Contact page navigation ──────────────────────────────────────────────────
+
+  /**
+   * Navigate to the contact page by trying common URL patterns in order.
+   * Stops at the first path that resolves to a page containing a contact form.
+   * Falls back to a nav-link click (text matching contact/reach-out patterns)
+   * if none of the static paths work.
+   */
+  async navigateToContactPage(): Promise<boolean> {
+    const base = this.url.replace(/\/$/, '');
+    const paths = [
+      '/contact',
+      '/contact-us',
+      '/get-in-touch',
+      '/reach-out',
+      '/reach-out-to-us',
+      '/reach-out-to-us-2',
+      '/reach-out-to-us-2/',
+      '/contact-us-2',
+      '/talk-to-us',
+      '/support/contact',
+    ];
+
+    for (const path of paths) {
+      try {
+        await this.page.goto(base + path, {
+          waitUntil: 'domcontentloaded',
+          timeout: 10_000,
+        });
+        const form = await this.findContactForm();
+        if (form) return true;
+      } catch {
+        // path doesn't exist — try next
+      }
+    }
+
+    // Last resort: click a nav link whose text suggests a contact page
+    const contactLink = this.page
+      .locator('a')
+      .filter({ hasText: /contact|reach.?out|get.?in.?touch|talk.?to.?us/i })
+      .first();
+
+    if (await contactLink.count() > 0) {
+      await contactLink.click();
+      await this.page.waitForLoadState('domcontentloaded');
+      const form = await this.findContactForm();
+      if (form) return true;
+    }
+
+    return false;
+  }
+
   // ── Form discovery ───────────────────────────────────────────────────────────
 
   /**

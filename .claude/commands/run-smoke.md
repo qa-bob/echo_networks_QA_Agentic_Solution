@@ -1,3 +1,8 @@
+---
+description: Run smoke tests and display a formatted pass/fail summary with fix suggestions
+invocation: user
+---
+
 # /run-smoke
 
 Run the smoke test suite and display a clean pass/fail summary.

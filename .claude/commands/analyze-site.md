@@ -1,3 +1,8 @@
+---
+description: Crawl the target site and produce a fully-populated site.config.json with an issues report
+invocation: user
+---
+
 # /analyze-site
 
 Analyze a live website and produce a fully-populated `site.config.json`.

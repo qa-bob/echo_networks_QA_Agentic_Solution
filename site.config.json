@@ -1,23 +1,29 @@
-﻿{
-    "name":  "Echo Networks",
-    "url":  "https://www.echonets.com",
-    "description":  "",
-    "industry":  "",
-    "hasContactForm":  true,
-    "expectedNavItems":  [
-
-                         ],
-    "viewports":  [
-                      "desktop",
-                      "mobile",
-                      "tablet"
-                  ],
-    "skipVisual":  false,
-    "skipForms":  false,
-    "auth":  {
-                 "required":  false,
-                 "loginUrl":  "",
-                 "username":  "",
-                 "password":  ""
-             }
+{
+    "name": "Echo Networks",
+    "url": "https://www.isptracker.com",
+    "description": "Internet uptime and ISP monitoring service",
+    "industry": "Network Monitoring / SaaS",
+    "hasContactForm": true,
+    "expectedNavItems": [
+        "Monitoring",
+        "Pricing",
+        "Hardware",
+        "Blog",
+        "Support",
+        "About",
+        "Login"
+    ],
+    "viewports": [
+        "desktop",
+        "mobile",
+        "tablet"
+    ],
+    "skipVisual": false,
+    "skipForms": false,
+    "auth": {
+        "required": false,
+        "loginUrl": "",
+        "username": "",
+        "password": ""
+    }
 }

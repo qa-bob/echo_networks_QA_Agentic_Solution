@@ -1,3 +1,8 @@
+---
+description: Capture new visual regression baseline screenshots after intentional design changes
+invocation: user
+---
+
 # /update-baseline
 
 Capture new visual regression baseline screenshots after intentional design changes.

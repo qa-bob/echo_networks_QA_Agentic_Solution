@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(npm test*)",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-test.sh",
+            "timeout": 30,
+            "statusMessage": "Verifying site reachability before tests..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(npm run test*)",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-test.sh",
+            "timeout": 30,
+            "statusMessage": "Verifying site reachability before tests..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(npx playwright*)",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-test.sh",
+            "timeout": 30,
+            "statusMessage": "Verifying site reachability before tests..."
+          }
+        ]
+      }
+    ]
+  }
+}
