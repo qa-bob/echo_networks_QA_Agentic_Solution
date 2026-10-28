@@ -17,7 +17,9 @@ test.describe('Navigation @navigation', () => {
 
   // ── Visibility ──────────────────────────────────────────────────────────────
 
-  test('navigation menu is visible @navigation', async ({ navigationPage }) => {
+  test('navigation menu is visible @navigation', async ({ navigationPage }, testInfo) => {
+    // Small viewports usually hide the nav behind a toggle — covered by the mobile nav test
+    test.skip(testInfo.project.name !== 'chromium-desktop', 'Runs only in the "chromium-desktop" project');
     const isVisible = await navigationPage.isNavVisible();
     expect(isVisible, 'A nav / [role="navigation"] element should be visible').toBeTruthy();
   });
@@ -28,10 +30,7 @@ test.describe('Navigation @navigation', () => {
     test.setTimeout(90_000);
     const results = await navigationPage.checkAllNavLinksReachable();
 
-    if (results.length === 0) {
-      console.warn('[navigation] No nav links found to check — skipping reachability assertion.');
-      return;
-    }
+    test.skip(results.length === 0, 'No nav links found to check');
 
     const broken = results.filter((r) => !r.ok && r.status !== 0);
     const unreachable = results.filter((r) => r.status === 0);
@@ -53,7 +52,8 @@ test.describe('Navigation @navigation', () => {
 
   // ── Mobile nav ──────────────────────────────────────────────────────────────
 
-  test('mobile nav menu toggles correctly @navigation', async ({ navigationPage, page }) => {
+  test('mobile nav menu toggles correctly @navigation', async ({ navigationPage, page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile-chrome', 'Runs only in the "mobile-chrome" project');
     // Switch to mobile viewport
     await page.setViewportSize({ width: 390, height: 844 });
     await navigationPage.navigate();
@@ -90,10 +90,7 @@ test.describe('Navigation @navigation', () => {
   test('nav links have descriptive text (not just "click here") @navigation', async ({ navigationPage }) => {
     const navLinks = await navigationPage.getNavLinks();
 
-    if (navLinks.length === 0) {
-      console.warn('[navigation] No nav links found — skipping text quality check.');
-      return;
-    }
+    test.skip(navLinks.length === 0, 'No nav links found');
 
     const badPhrases = /^(click here|here|more|read more|learn more|link|go)$/i;
     const genericLinks = navLinks.filter((link) => badPhrases.test(link.text.trim()));
@@ -116,10 +113,7 @@ test.describe('Navigation @navigation', () => {
       'header a[href="/"], header a[href="' + siteConfig.url + '"]'
     ).first();
 
-    if (await logoLink.count() === 0) {
-      console.warn('[navigation] Could not identify a logo link — skipping this assertion.');
-      return;
-    }
+    test.skip(await logoLink.count() === 0, 'Could not identify a logo link');
 
     const href = await logoLink.getAttribute('href');
     expect(href).not.toBeNull();
